@@ -1,34 +1,90 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace GradeBook
 {
     public delegate void GradeAddedDelegeate(object sender, EventArgs args);
 
-    public abstract class Book : NamedObject
+    public abstract class Book : NamedObject, IBook
     {
         protected Book(string name) : base(name)
         {
         }
 
+        public abstract event GradeAddedDelegeate GradeAdded;
+
         public abstract void AddGrade(double grade);
 
+        public abstract Statistics GetStatistics();
+    }
+
+    public interface IBook
+    {
+        void AddGrade(double grade);
+        Statistics GetStatistics();
+        string Name { get; }
+        event GradeAddedDelegeate GradeAdded;
+
+    }
+
+
+
+    public class DiskBook : Book
+    {
+        public DiskBook(string name) : base(name)
+        {
+        }
+
+        public override event GradeAddedDelegeate GradeAdded;
+
+        public override void AddGrade(double grade)
+        {
+            using (var writer = File.AppendText($"{Name}.txt"))
+            {
+                writer.WriteLine(grade);
+                if (GradeAdded != null)
+                {
+                    GradeAdded(this, new EventArgs());
+                }
+            }
+
+
+
+        }
+
+        public override Statistics GetStatistics()
+        {
+            var result = new Statistics();
+            using(var reader = File.OpenText($"{Name}.txt"))
+            {
+                var line = reader.ReadLine();
+                while(line!= null)
+                {
+                    var number = double.Parse(line);                 
+                    result.Add(number);
+                    line = reader.ReadLine();
+
+                }
+            }
+            return result;
+        }
     }
 
     public class InMemoryBook : Book
     {
         public InMemoryBook(string name) : base(name)
         {
-             Name = name;
-           grades = new List<double>();
+            Name = name;
+            grades = new List<double>();
         }
 
-        public override void AddGrade(double grade) 
+        public override void AddGrade(double grade)
         {
-            if(grade <= 100 && grade >= 0)
+            if (grade <= 100 && grade >= 0)
             {
                 grades.Add(grade);
-                if(GradeAdded != null)
+                if (GradeAdded != null)
                 {
                     GradeAdded(this, new EventArgs());
                 }
@@ -37,13 +93,13 @@ namespace GradeBook
             {
                 throw new ArgumentException($"Invalid {nameof(grade)}");
             }
-            
+
         }
-         public event GradeAddedDelegeate GradeAdded;
+        public override event GradeAddedDelegeate GradeAdded;
 
         public void AddGrade(char letter)
         {
-            switch(letter)
+            switch (letter)
             {
                 case 'A':
                     AddGrade(90);
@@ -63,36 +119,33 @@ namespace GradeBook
                 default:
                     AddGrade(0);
                     break;
-                
-            }
-        } 
-       
 
-        public Statistics GetStatistics()
+            }
+        }
+
+
+        public override Statistics GetStatistics()
         {
-            var statisticsResult= new Statistics();
-            
-           statisticsResult.Average = 0.0;
-           statisticsResult.High = double.MinValue;
-           statisticsResult.Low = double.MaxValue;
-           
-           foreach(double grade in grades)
-           {
-                statisticsResult.High = Math.Max(grade, statisticsResult.High);
-                statisticsResult.Low = Math.Min(grade, statisticsResult.Low);
-                statisticsResult.Average += grade;  
-           }
-           
-           /*
-           var index =0 ;
-           do  
-           {
-                statisticsResult.High = Math.Max(grades[index], statisticsResult.High);
-                statisticsResult.Low = Math.Min(grades[index], statisticsResult.Low);
-                statisticsResult.Average += grades[index];
-                index+=1;  
-           } while(index < grades.Count);
-            */
+            var statisticsResult = new Statistics();
+
+
+
+            foreach (double grade in grades)
+            {
+                statisticsResult.Add(grade);
+
+            }
+
+            /*
+            var index =0 ;
+            do  
+            {
+                 statisticsResult.High = Math.Max(grades[index], statisticsResult.High);
+                 statisticsResult.Low = Math.Min(grades[index], statisticsResult.Low);
+                 statisticsResult.Average += grades[index];
+                 index+=1;  
+            } while(index < grades.Count);
+             */
             /*
            var index =0 ;
            while(index < grades.Count)
@@ -103,69 +156,48 @@ namespace GradeBook
                 index+=1;  
            };
            */
-           /*
-           for(var index =0;index<grades.Count;index+=1)
-           {
-                statisticsResult.High = Math.Max(grades[index], statisticsResult.High);
-                statisticsResult.Low = Math.Min(grades[index], statisticsResult.Low);
-                statisticsResult.Average += grades[index];
-                index+=1;  
-           }
-           */
-           statisticsResult.Average /= grades.Count;
+            /*
+            for(var index =0;index<grades.Count;index+=1)
+            {
+                 statisticsResult.High = Math.Max(grades[index], statisticsResult.High);
+                 statisticsResult.Low = Math.Min(grades[index], statisticsResult.Low);
+                 statisticsResult.Average += grades[index];
+                 index+=1;  
+            }
+            */
 
-           switch(statisticsResult.Average)
-           {
-               case var d when d >= 90.0:
-                    statisticsResult.Letter ='A';
-                    break;
 
-                case var d when d >= 80.0:
-                    statisticsResult.Letter ='B';
-                    break;
 
-                case var d when d >= 70.0:
-                    statisticsResult.Letter ='C';
-                    break;
 
-                case var d when d >= 60.0:
-                    statisticsResult.Letter ='D';
-                    break;
-
-                default:
-                    statisticsResult.Letter ='F';
-                    break;
-           }
-
-           return statisticsResult;
+            return statisticsResult;
 
         }
 
         private List<double> grades;
 
-         /*
-         public string Name
-         {
-             get
-             {
-                 return name;
-             }
-             set
-             {
-                 if(!String.IsNullOrEmpty(value))
-                 {
-                     name = value; 
-                 }
-                 else
-                 {
-                     throw new ArgumentNullException($"Null value received for {nameof(value)}");
+        /*
+        public string Name
+        {
+            get
+            {
+                return name;
+            }
+            set
+            {
+                if(!String.IsNullOrEmpty(value))
+                {
+                    name = value; 
+                }
+                else
+                {
+                    throw new ArgumentNullException($"Null value received for {nameof(value)}");
 
-                 }
-                 
-             }
-         }
-        private string name;
-        */
+                }
+
+            }
+        }
+       private string name;
+       */
 
         /*
         Alternate smaller way to do this
