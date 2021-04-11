@@ -4,15 +4,26 @@ using System.Collections.Generic;
 namespace GradeBook
 {
     public delegate void GradeAddedDelegeate(object sender, EventArgs args);
-    public class Book
+
+    public abstract class Book : NamedObject
     {
-        public Book(string name)
+        protected Book(string name) : base(name)
+        {
+        }
+
+        public abstract void AddGrade(double grade);
+
+    }
+
+    public class InMemoryBook : Book
+    {
+        public InMemoryBook(string name) : base(name)
         {
              Name = name;
            grades = new List<double>();
         }
 
-        public void AddGrade(double grade) 
+        public override void AddGrade(double grade) 
         {
             if(grade <= 100 && grade >= 0)
             {
@@ -129,9 +140,10 @@ namespace GradeBook
            return statisticsResult;
 
         }
-        
-         private List<double> grades;
 
+        private List<double> grades;
+
+         /*
          public string Name
          {
              get
@@ -153,6 +165,7 @@ namespace GradeBook
              }
          }
         private string name;
+        */
 
         /*
         Alternate smaller way to do this
