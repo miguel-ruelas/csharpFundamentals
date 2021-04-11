@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\adminx\\Documents\\gradebook\\src\\GradeBook\\Gradebook.csproj": {}
+    "C:\\Users\\adminx\\Documents\\gradebook\\src\\GradeBook\\GradeBook.csproj": {}
   },
   "projects": {
-    "C:\\Users\\adminx\\Documents\\gradebook\\src\\GradeBook\\Gradebook.csproj": {
+    "C:\\Users\\adminx\\Documents\\gradebook\\src\\GradeBook\\GradeBook.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\adminx\\Documents\\gradebook\\src\\GradeBook\\Gradebook.csproj",
-        "projectName": "Gradebook",
-        "projectPath": "C:\\Users\\adminx\\Documents\\gradebook\\src\\GradeBook\\Gradebook.csproj",
+        "projectUniqueName": "C:\\Users\\adminx\\Documents\\gradebook\\src\\GradeBook\\GradeBook.csproj",
+        "projectName": "GradeBook",
+        "projectPath": "C:\\Users\\adminx\\Documents\\gradebook\\src\\GradeBook\\GradeBook.csproj",
         "packagesPath": "C:\\Users\\adminx\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\adminx\\Documents\\gradebook\\src\\GradeBook\\obj\\",
         "projectStyle": "PackageReference",
